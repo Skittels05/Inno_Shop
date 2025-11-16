@@ -1,1 +1,6 @@
-<Solution />
+<Solution>
+  <Folder Name="/Products/" />
+  <Folder Name="/Users/">
+    <Project Path="Users/Users.Domain/Users.Domain.csproj" />
+  </Folder>
+</Solution>
