@@ -1,10 +1,11 @@
 <Solution>
   <Folder Name="/Products/">
-    <Project Path="Products/Products.Application/Products.Application.csproj" Id="0dd6ff39-3307-455c-a6c5-34024b797bc0" />
-    <Project Path="Products/Products.Domain/Products.Domain.csproj" Id="cc941d9c-cdf1-46ef-8db7-f4351ef1ef69" />
+    <Project Path="Products/Products.Application/Products.Application.csproj" />
+    <Project Path="Products/Products.Domain/Products.Domain.csproj" />
   </Folder>
   <Folder Name="/Users/">
-    <Project Path="Users/Users.Application/Users.Application.csproj" Id="afd67758-1821-456d-9fb8-ec86470a02df" />
+    <Project Path="Users/Users.Application/Users.Application.csproj" />
     <Project Path="Users/Users.Domain/Users.Domain.csproj" />
+    <Project Path="Users/Users.Infrastructure/Users.Infrastructure.csproj" />
   </Folder>
 </Solution>
