@@ -12,6 +12,7 @@ namespace Users.Domain.Interfaces.Repositories
     {
         IQueryable<User> FindAll(bool trackChanges = false);
         IQueryable<User> FindByCondition(Expression<Func<User, bool>> expression, bool trackChanges = false);
+        Task<User> GetByIdAsync(Guid id);
         Task CreateAsync(User user);
         Task UpdateAsync(User user);
         Task DeleteAsync(User user);
