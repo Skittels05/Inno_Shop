@@ -1,7 +1,7 @@
 ﻿using BCrypt.Net;
-using Users.Application.Interfaces.Security;
+using Users.Application.Interfaces.Identity;
 
-namespace Users.Infrastructure.Security
+namespace Users.Infrastructure.Identity
 {
     public class BCryptPasswordHasher : IPasswordHasher
     {

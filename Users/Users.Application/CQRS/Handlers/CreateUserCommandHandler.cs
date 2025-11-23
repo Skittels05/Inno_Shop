@@ -4,7 +4,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Users.Application.CQRS.Commands;
-using Users.Application.Interfaces.Security;
+using Users.Application.Interfaces.Identity;
 using Users.Domain.Entities;
 using Users.Domain.Interfaces.Repositories;
 
