@@ -37,6 +37,9 @@ namespace Users.Infrastructure.Data.Configurations
             builder.Property(u => u.EmailConfirmed)
                .HasColumnName("email_confirmed")
                .IsRequired();
+            builder.Property(u => u.IsActive)
+                .HasColumnName("is_active")
+                .IsRequired();
 
         }
     }
