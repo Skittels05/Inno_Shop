@@ -40,6 +40,13 @@ namespace Users.Infrastructure.Data.Configurations
             builder.Property(u => u.IsActive)
                 .HasColumnName("is_active")
                 .IsRequired();
+            builder.Property(u => u.PasswordRecoveryToken)
+                .HasColumnName("password_recovery_token")
+                .HasMaxLength(100)
+                .IsRequired(false);
+            builder.Property(u => u.PasswordRecoveryTokenExpiration)
+                .HasColumnName("password_recovery_token_expiration")
+                .IsRequired(false);
 
         }
     }

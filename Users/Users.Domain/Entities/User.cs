@@ -17,5 +17,7 @@ namespace Users.Domain.Entities
         public string PasswordHash { get; set; }
         public bool IsActive {  get; set; }
         public bool EmailConfirmed { get; set; } = false;
+        public string? PasswordRecoveryToken { get; set; }
+        public DateTime? PasswordRecoveryTokenExpiration { get; set; }
     }
 }
