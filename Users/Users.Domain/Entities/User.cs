@@ -19,5 +19,7 @@ namespace Users.Domain.Entities
         public bool EmailConfirmed { get; set; } = false;
         public string? PasswordRecoveryToken { get; set; }
         public DateTime? PasswordRecoveryTokenExpiration { get; set; }
+        public string? EmailConfirmationToken { get; set; }
+        public DateTime? EmailConfirmationTokenExpiration { get; set; }
     }
 }

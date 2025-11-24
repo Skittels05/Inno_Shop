@@ -9,5 +9,7 @@ namespace Users.Application.Interfaces.Services
     public interface IEmailService
     {
         Task SendPasswordRecoveryEmail(string email, string token);
+        Task SendEmailConfirmationEmail(string email, string token);
+
     }
 }

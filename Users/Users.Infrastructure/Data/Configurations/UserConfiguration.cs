@@ -47,7 +47,13 @@ namespace Users.Infrastructure.Data.Configurations
             builder.Property(u => u.PasswordRecoveryTokenExpiration)
                 .HasColumnName("password_recovery_token_expiration")
                 .IsRequired(false);
-
+            builder.Property(u => u.EmailConfirmationToken)
+                .HasColumnName("email_confirmation_token")
+                .HasMaxLength(100)
+                .IsRequired(false);
+            builder.Property(u => u.EmailConfirmationTokenExpiration)
+                .HasColumnName("email_confirmation_token_expiration")
+                .IsRequired(false);
         }
     }
 }

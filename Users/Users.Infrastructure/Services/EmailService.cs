@@ -11,5 +11,11 @@ namespace Users.Infrastructure.Services
             Console.WriteLine($"Password recovery token for {email}: {token}");
             await Task.CompletedTask;
         }
+        public async Task SendEmailConfirmationEmail(string email, string token)
+        {
+            // реализация...
+            Console.WriteLine($"Email confirmation token for {email}: {token}");
+            await Task.CompletedTask;
+        }
     }
 }

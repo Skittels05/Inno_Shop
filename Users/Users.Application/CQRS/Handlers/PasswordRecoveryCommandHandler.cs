@@ -2,6 +2,7 @@
 using Users.Application.CQRS.Commands;
 using Users.Application.Interfaces;
 using Users.Application.Interfaces.Repositories;
+using Users.Application.Interfaces.Services;
 
 namespace Users.Application.CQRS.Handlers
 {
