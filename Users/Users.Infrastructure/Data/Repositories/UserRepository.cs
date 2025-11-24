@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Users.Domain.Entities;
-using Users.Domain.Interfaces.Repositories;
+using Users.Application.Interfaces.Repositories;
 using static Users.Infrastructure.Data.UserContext;
 
 namespace Users.Infrastructure.Data.Repositories
@@ -17,5 +17,11 @@ namespace Users.Infrastructure.Data.Repositories
         {
             return await _context.Set<User>().FirstOrDefaultAsync(u => u.Id == id);
         }
+        public async Task<User?> GetByEmailAsync(string email, bool trackChanges)
+        {
+            return await FindByCondition(u => u.Email == email, trackChanges)
+                .FirstOrDefaultAsync();
+        }
+
     }
 }

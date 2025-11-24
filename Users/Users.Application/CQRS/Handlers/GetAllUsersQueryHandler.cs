@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Users.Application.CQRS.Queries;
 using Users.Application.DTOs;
-using Users.Domain.Interfaces.Repositories;
+using Users.Application.Interfaces.Repositories;
 
 namespace Users.Application.CQRS.Handlers
 {
