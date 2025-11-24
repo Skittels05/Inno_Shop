@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Users.Application.CQRS.Commands;
 using Users.Application.DTOs;
+using Users.Application.Exceptions;
 using Users.Application.Interfaces.Identity;
 using Users.Application.Interfaces.Repositories;
 
@@ -27,9 +28,9 @@ namespace Users.Application.CQRS.Handlers
             var dto = request.LoginDto;
             var user = await _userRepository.GetByEmailAsync(dto.Email, false);
             if (user == null)
-                throw new Exception("Invalid credentials");
+                throw new BadRequestException("Invalid credentials");
             if (!_passwordHasher.Verify(dto.Password, user.PasswordHash))
-                throw new Exception("Invalid credentials");
+                throw new BadRequestException("Invalid credentials");
             if (!user.IsActive)
                 throw new Exception("Account is inactive");
             if (!user.EmailConfirmed)

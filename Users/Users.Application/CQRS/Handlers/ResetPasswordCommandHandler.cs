@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Users.Application.CQRS.Commands;
+using Users.Application.Exceptions;
 using Users.Application.Interfaces;
 using Users.Application.Interfaces.Identity;
 using Users.Application.Interfaces.Repositories;
@@ -22,12 +23,12 @@ namespace Users.Application.CQRS.Handlers
             var user = await _userRepository.GetByEmailAsync(request.ResetDto.Email, true); 
 
             if (user == null)
-                throw new Exception("Invalid or expired recovery token"); 
+                throw new BadRequestException("Invalid or expired recovery token");
 
             if (user.PasswordRecoveryToken != request.ResetDto.Token ||
                 user.PasswordRecoveryTokenExpiration < DateTime.UtcNow)
             {
-                throw new Exception("Invalid or expired recovery token");
+                throw new BadRequestException("Invalid or expired recovery token");
             }
 
             user.PasswordHash = _passwordHasher.Hash(request.ResetDto.NewPassword);
