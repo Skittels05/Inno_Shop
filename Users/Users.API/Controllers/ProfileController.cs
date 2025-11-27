@@ -27,8 +27,16 @@ public class ProfileController : ControllerBase
     [HttpPut]
     public async Task<IActionResult> UpdateProfile([FromBody] UpdateMyProfileDto dto)
     {
-        await _mediator.Send(new UpdateMyProfileCommand(CurrentUserId, dto));
-        return NoContent();
+        try
+        {
+            await _mediator.Send(new UpdateMyProfileCommand(CurrentUserId, dto));
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { error = true, message = ex.Message, stackTrace = ex.StackTrace });
+        }
+
     }
 
     [HttpPatch]

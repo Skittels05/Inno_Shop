@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 using MediatR;
 using Users.Application.CQRS.Commands;
+using Users.Application.DTOs;
 using Users.Application.Exceptions;
 using Users.Application.Interfaces.Repositories;
 using Users.Application.Interfaces.Services;
+using Users.Domain.Entities;
 
 namespace Users.Application.CQRS.Handlers;
 
@@ -29,41 +31,30 @@ public class UpdateMyProfileCommandHandler : IRequestHandler<UpdateMyProfileComm
         if (user == null)
             throw new NotFoundException("User not found");
 
-        var newEmail = request.Dto.Email;
-        bool emailChanged = !string.IsNullOrEmpty(newEmail) &&
-                            !newEmail.Equals(user.Email, StringComparison.OrdinalIgnoreCase);
-
-        if (emailChanged)
+        if (!string.IsNullOrEmpty(request.Dto.Name) &&
+            !request.Dto.Name.Equals(user.Name, StringComparison.OrdinalIgnoreCase))
         {
-            var existingUserByEmail = await _userRepository.GetByEmailAsync(newEmail!, false);
+            var existingUserByName = await _userRepository.GetByNameAsync(request.Dto.Name);
+            if (existingUserByName != null && existingUserByName.Id != user.Id)
+                throw new BadRequestException("Name already in use");
+
+            user.Name = request.Dto.Name;
+        }
+
+        if (!string.IsNullOrEmpty(request.Dto.Email) &&
+            !request.Dto.Email.Equals(user.Email, StringComparison.OrdinalIgnoreCase))
+        {
+            var existingUserByEmail = await _userRepository.GetByEmailAsync(request.Dto.Email, false);
             if (existingUserByEmail != null && existingUserByEmail.Id != user.Id)
                 throw new BadRequestException("Email already in use");
 
+            user.Email = request.Dto.Email;
             user.EmailConfirmed = false;
             user.EmailConfirmationToken = Guid.NewGuid().ToString("N") + Guid.NewGuid().ToString("N");
             user.EmailConfirmationTokenExpiration = DateTime.UtcNow.AddHours(24);
 
-            await _emailService.SendEmailConfirmationEmail(newEmail!, user.EmailConfirmationToken);
+            await _emailService.SendEmailConfirmationEmail(user.Email, user.EmailConfirmationToken);
         }
-
-        var newName = request.Dto.Name;
-        bool nameChanged = !string.IsNullOrEmpty(newName) &&
-                           !newName.Equals(user.Name, StringComparison.OrdinalIgnoreCase);
-
-        if (nameChanged)
-        {
-            var existingUserByName = await _userRepository.GetByNameAsync(newName!);
-            if (existingUserByName != null && existingUserByName.Id != user.Id)
-                throw new BadRequestException("Name already in use");
-        }
-
-        _mapper.Map(request.Dto, user);
-
-        if (emailChanged)
-            user.Email = newEmail!;
-        if (nameChanged)
-            user.Name = newName!;
-
         await _userRepository.UpdateAsync(user);
 
         return Unit.Value;
