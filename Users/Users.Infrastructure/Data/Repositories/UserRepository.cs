@@ -22,6 +22,11 @@ namespace Users.Infrastructure.Data.Repositories
             return await FindByCondition(u => u.Email == email, trackChanges)
                 .FirstOrDefaultAsync();
         }
+        public async Task<User?> GetByNameAsync(string name, bool trackChanges = false)
+        {
+            return await FindByCondition(u => u.Name == name, trackChanges)
+                .FirstOrDefaultAsync();
+        }
 
     }
 }

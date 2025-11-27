@@ -4,6 +4,7 @@
     <Project Path="Products/Products.Domain/Products.Domain.csproj" />
   </Folder>
   <Folder Name="/Users/">
+    <Project Path="Users/Users.API/Users.API.csproj" Id="514580fe-be5b-4d87-8c5e-d3ab82172378" />
     <Project Path="Users/Users.Application/Users.Application.csproj" />
     <Project Path="Users/Users.Domain/Users.Domain.csproj" />
     <Project Path="Users/Users.Infrastructure/Users.Infrastructure.csproj" />

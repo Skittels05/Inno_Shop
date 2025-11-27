@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Users.Application.CQRS.Commands;
+using Users.Application.Exceptions;
 using Users.Application.Interfaces.Repositories;
 using Users.Application.Interfaces.Services;
 
@@ -19,8 +20,12 @@ namespace Users.Application.CQRS.Handlers
         public async Task<Unit> Handle(SendEmailConfirmationCommand request, CancellationToken cancellationToken)
         {
             var user = await _userRepository.GetByEmailAsync(request.Email, false);
-            if (user == null || user.EmailConfirmed)
-                return Unit.Value;
+
+            if (user == null)
+                throw new NotFoundException("User not found");
+
+            if (user.EmailConfirmed)
+                throw new BadRequestException("Email is already confirmed");
 
             user.EmailConfirmationToken = GenerateEmailConfirmationToken();
             user.EmailConfirmationTokenExpiration = DateTime.UtcNow.AddHours(24);

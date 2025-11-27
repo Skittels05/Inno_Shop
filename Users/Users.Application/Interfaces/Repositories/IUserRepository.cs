@@ -14,6 +14,7 @@ namespace Users.Application.Interfaces.Repositories
         IQueryable<User> FindByCondition(Expression<Func<User, bool>> expression, bool trackChanges = false);
         Task<User> GetByIdAsync(Guid id);
         Task<User?> GetByEmailAsync(string email, bool trackChanges);
+        Task<User?> GetByNameAsync(string name, bool trackChanges = false);
         Task CreateAsync(User user);
         Task UpdateAsync(User user);
         Task DeleteAsync(User user);

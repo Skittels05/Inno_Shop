@@ -1,11 +1,14 @@
-﻿using System;
+﻿using AutoMapper;
+using FluentValidation;
+using MediatR;
+using Microsoft.Extensions.Hosting;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Hosting;
-using AutoMapper;
+using Users.Application.Behaviours;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -19,5 +22,8 @@ public static class DependencyInjection
         {
             cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
         });
+        builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+        builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
+        builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehaviour<,>));
     }
 }

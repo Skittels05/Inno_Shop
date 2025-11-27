@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Users.Application.CQRS.Commands;
+using Users.Application.Exceptions;
 using Users.Application.Interfaces.Repositories;
 
 namespace Users.Application.CQRS.Handlers
@@ -18,12 +19,12 @@ namespace Users.Application.CQRS.Handlers
             var user = await _userRepository.GetByEmailAsync(request.Email, false);
 
             if (user == null)
-                return false;
+                throw new NotFoundException("User not found");
 
             if (user.EmailConfirmationToken != request.Token ||
                 user.EmailConfirmationTokenExpiration < DateTime.UtcNow)
             {
-                return false;
+                throw new BadRequestException("Invalid or expired token");
             }
 
             user.EmailConfirmed = true;

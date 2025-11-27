@@ -21,9 +21,6 @@ namespace Users.Application.Validators
                 .NotEmpty().WithMessage("Password is required")
                 .MinimumLength(6).WithMessage("Password must be at least 6 characters")
                 .MaximumLength(100).WithMessage("Password must not exceed 100 characters");
-
-            RuleFor(x => x.Role)
-                .IsInEnum().WithMessage("Invalid role");
         }
     }
 }

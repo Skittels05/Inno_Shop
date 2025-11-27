@@ -27,26 +27,12 @@ namespace Users.Application.CQRS.Handlers
         {
             var dto = request.LoginDto;
             var user = await _userRepository.GetByEmailAsync(dto.Email, false);
-            if (user == null)
+            if (user == null || !_passwordHasher.Verify(dto.Password, user.PasswordHash))
                 throw new BadRequestException("Invalid credentials");
-            if (!_passwordHasher.Verify(dto.Password, user.PasswordHash))
-                throw new BadRequestException("Invalid credentials");
-            if (!user.IsActive)
-                throw new Exception("Account is inactive");
-            if (!user.EmailConfirmed)
-                throw new Exception("Email is not confirmed");
-            var token = _jwtTokenGenerator.GenerateToken(
-                user.Id,
-                user.Email,
-                user.Role.ToString()
-            );
+            var token = _jwtTokenGenerator.GenerateToken(user.Id, user.Email, user.Role.ToString());
 
-            return new AuthResultDto(
-                token,
-                user.Id,
-                user.Email,
-                user.Role.ToString()
-            );
+            return new AuthResultDto(token, user.Id, user.Email, user.Role.ToString());
+
         }
     }
 }
