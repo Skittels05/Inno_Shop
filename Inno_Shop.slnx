@@ -1,7 +1,9 @@
 <Solution>
   <Folder Name="/Products/">
+    <Project Path="Products/Products.API/Products.API/Products.API.csproj" Id="e124f33f-82f2-4ec3-8648-324fe971eb34" />
     <Project Path="Products/Products.Application/Products.Application.csproj" />
     <Project Path="Products/Products.Domain/Products.Domain.csproj" />
+    <Project Path="Products/Products.Infrastructure/Products.Infrastructure/Products.Infrastructure.csproj" Id="8c18bbab-44d8-4d6d-86a7-faf23d3c3a9e" />
   </Folder>
   <Folder Name="/Users/">
     <Project Path="Users/Users.API/Users.API.csproj" Id="514580fe-be5b-4d87-8c5e-d3ab82172378" />

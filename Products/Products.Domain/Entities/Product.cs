@@ -13,6 +13,8 @@ namespace Products.Domain.Entities
         public string Description { get; set; }
         public bool IsAvailable { get; set; }
         public Guid UserId {  get; set; }
+        public bool IsDeleted { get; set; } = false;
+        public DateTime? DeletedAt { get; set; }
 
     }
 }
