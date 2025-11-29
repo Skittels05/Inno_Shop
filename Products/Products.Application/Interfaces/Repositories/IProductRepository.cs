@@ -16,6 +16,10 @@ namespace Products.Domain.Interfaces.Repositories
         Task CreateAsync(Product product);
         Task UpdateAsync(Product product);
         Task DeleteAsync(Product product);
+        Task<IEnumerable<Product>> GetProductsByUserAsync(Guid userId, bool includeDeleted = false);
+        Task UpdateRangeAsync(IEnumerable<Product> products);
+
+
     }
 
 }

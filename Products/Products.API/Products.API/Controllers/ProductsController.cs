@@ -19,10 +19,8 @@ namespace Products.Api.Controllers
         private readonly IMediator _mediator;
         public ProductsController(IMediator mediator) => _mediator = mediator;
 
-        // Получаем текущего пользователя из JWT
         private Guid CurrentUserId => Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
 
-        // GET: api/products
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ProductDto>>> GetMyProducts()
         {
@@ -30,7 +28,6 @@ namespace Products.Api.Controllers
             return Ok(products);
         }
 
-        // GET: api/products/{id}
         [HttpGet("{id:guid}")]
         public async Task<ActionResult<ProductDto>> GetById(Guid id)
         {
@@ -38,7 +35,6 @@ namespace Products.Api.Controllers
             return Ok(product);
         }
 
-        // POST: api/products
         [HttpPost]
         public async Task<ActionResult<Guid>> Create([FromBody] CreateProductDto dto)
         {
@@ -46,7 +42,6 @@ namespace Products.Api.Controllers
             return CreatedAtAction(nameof(GetById), new { id = productId }, null);
         }
 
-        // PUT: api/products/{id}
         [HttpPut("{id:guid}")]
         public async Task<IActionResult> Update(Guid id, [FromBody] UpdateProductDto dto)
         {
@@ -54,7 +49,6 @@ namespace Products.Api.Controllers
             return NoContent();
         }
 
-        // DELETE: api/products/{id}
         [HttpDelete("{id:guid}")]
         public async Task<IActionResult> Delete(Guid id)
         {

@@ -17,5 +17,7 @@ public static class DependencyInjection
         {
             cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
         });
+        //builder.Services.AddSingleton<IRabbitMQService, RabbitMQService>();
+        //builder.Services.AddHostedService<UserEventsBackgroundService>();
     }
 }

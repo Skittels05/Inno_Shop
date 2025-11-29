@@ -2,6 +2,7 @@
 using Products.Domain.Entities;
 using Products.Domain.Interfaces.Repositories;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -29,51 +30,20 @@ namespace Products.Infrastructure.Data.Repositories
             return base.FindByCondition(expression, trackChanges).Where(p => !p.IsDeleted);
         }
 
-        public async Task DeleteAsync(Product product)
+        public async Task<IEnumerable<Product>> GetProductsByUserAsync(Guid userId, bool includeDeleted = false)
         {
-            product.IsDeleted = true;
-            product.DeletedAt = DateTime.UtcNow;
-            _context.Products.Update(product);
-            await _context.SaveChangesAsync();
+            var query = _context.Products.Where(p => p.UserId == userId);
+
+            if (!includeDeleted)
+                query = query.Where(p => !p.IsDeleted);
+
+            return await query.ToListAsync();
         }
-        public async Task SoftDeleteByUserAsync(Guid userId)
+
+        public async Task UpdateRangeAsync(IEnumerable<Product> products)
         {
-            var products = await _context.Products
-                .Where(p => p.UserId == userId && !p.IsDeleted)
-                .ToListAsync();
-
-            if (!products.Any())
-                return;
-
-            products.ForEach(p =>
-            {
-                p.IsDeleted = true;
-                p.DeletedAt = DateTime.UtcNow;
-            });
-
             _context.Products.UpdateRange(products);
             await _context.SaveChangesAsync();
         }
-
-        public async Task RestoreByUserAsync(Guid userId)
-        {
-            var products = await _context.Products
-                .Where(p => p.UserId == userId && p.IsDeleted)
-                .ToListAsync();
-
-            if (!products.Any())
-                return;
-
-            products.ForEach(p =>
-            {
-                p.IsDeleted = false;
-                p.DeletedAt = null;
-            });
-
-            _context.Products.UpdateRange(products);
-            await _context.SaveChangesAsync();
-        }
-
     }
-
 }
