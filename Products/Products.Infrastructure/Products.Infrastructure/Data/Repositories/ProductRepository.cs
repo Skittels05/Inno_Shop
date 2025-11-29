@@ -22,12 +22,14 @@ namespace Products.Infrastructure.Data.Repositories
 
         public override IQueryable<Product> FindAll(bool trackChanges = false)
         {
-            return base.FindAll(trackChanges).Where(p => !p.IsDeleted);
+            var query = base.FindAll(trackChanges).Where(p => !p.IsDeleted);
+            return trackChanges ? query : query.AsNoTracking();
         }
 
         public override IQueryable<Product> FindByCondition(Expression<Func<Product, bool>> expression, bool trackChanges = false)
         {
-            return base.FindByCondition(expression, trackChanges).Where(p => !p.IsDeleted);
+            var query = base.FindByCondition(expression, trackChanges).Where(p => !p.IsDeleted);
+            return trackChanges ? query : query.AsNoTracking();
         }
 
         public async Task<IEnumerable<Product>> GetProductsByUserAsync(Guid userId, bool includeDeleted = false)

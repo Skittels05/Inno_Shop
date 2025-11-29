@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Products.Application.CQRS.Commands
+namespace Products.Application.CQRS.Queries
 {
-    public record CreateProductCommand(CreateProductDto Dto, Guid UserId) : IRequest<ProductDto>;
+    public record GetAllPublicProductsQuery() : IRequest<IEnumerable<ProductDto>>;
 }

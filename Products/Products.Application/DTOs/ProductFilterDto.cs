@@ -6,5 +6,9 @@ using System.Threading.Tasks;
 
 namespace Products.Application.DTOs
 {
-    public record UpdateProductDto(string? Name, string? Description, bool? IsAvailable);
+    public record ProductFilterDto(
+        string? Name = null,
+        string? Description = null,
+        bool? IsAvailable = null
+    );
 }

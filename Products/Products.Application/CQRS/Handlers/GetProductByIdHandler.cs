@@ -3,6 +3,7 @@ using MediatR;
 using Products.Application.CQRS.Queries;
 using Products.Application.DTOs;
 using Products.Domain.Interfaces.Repositories;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,7 +22,9 @@ namespace Products.Application.CQRS.Handlers
 
         public async Task<ProductDto> Handle(GetProductByIdQuery request, CancellationToken cancellationToken)
         {
-            var product = await _repository.GetByIdAsync(request.ProductId, request.UserId);
+            var product = await Task.Run(() =>
+                _repository.FindByCondition(p => p.Id == request.ProductId)
+                    .FirstOrDefault(), cancellationToken);
 
             if (product == null)
                 return null;

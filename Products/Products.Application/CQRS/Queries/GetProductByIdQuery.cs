@@ -8,5 +8,5 @@ using System.Threading.Tasks;
 
 namespace Products.Application.CQRS.Queries
 {
-    public record GetProductByIdQuery(Guid ProductId, Guid UserId) : IRequest<ProductDto>;
+    public record GetProductByIdQuery(Guid ProductId) : IRequest<ProductDto>;
 }

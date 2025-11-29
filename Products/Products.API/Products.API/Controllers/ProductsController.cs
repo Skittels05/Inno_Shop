@@ -28,18 +28,11 @@ namespace Products.Api.Controllers
             return Ok(products);
         }
 
-        [HttpGet("{id:guid}")]
-        public async Task<ActionResult<ProductDto>> GetById(Guid id)
-        {
-            var product = await _mediator.Send(new GetProductByIdQuery(id, CurrentUserId));
-            return Ok(product);
-        }
-
         [HttpPost]
-        public async Task<ActionResult<Guid>> Create([FromBody] CreateProductDto dto)
+        public async Task<ActionResult<ProductDto>> Create([FromBody] CreateProductDto dto)
         {
-            var productId = await _mediator.Send(new CreateProductCommand(dto, CurrentUserId));
-            return CreatedAtAction(nameof(GetById), new { id = productId }, null);
+            var product = await _mediator.Send(new CreateProductCommand(dto, CurrentUserId));
+            return Ok(product);
         }
 
         [HttpPut("{id:guid}")]

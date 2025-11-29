@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using MediatR;
 using Products.Application.CQRS.Commands;
+using Products.Application.DTOs;
 using Products.Domain.Entities;
 using Products.Domain.Interfaces.Repositories;
 using System;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Products.Application.CQRS.Handlers
 {
-    public class CreateProductHandler : IRequestHandler<CreateProductCommand, Guid>
+    public class CreateProductHandler : IRequestHandler<CreateProductCommand, ProductDto>
     {
         private readonly IProductRepository _repository;
         private readonly IMapper _mapper;
@@ -22,13 +23,13 @@ namespace Products.Application.CQRS.Handlers
             _mapper = mapper;
         }
 
-        public async Task<Guid> Handle(CreateProductCommand request, CancellationToken cancellationToken)
+        public async Task<ProductDto> Handle(CreateProductCommand request, CancellationToken cancellationToken)
         {
             var product = _mapper.Map<Product>(request.Dto);
             product.UserId = request.UserId;
             await _repository.CreateAsync(product);
-            return product.Id;
+
+            return _mapper.Map<ProductDto>(product);
         }
     }
-
 }
