@@ -10,6 +10,7 @@ using Users.Infrastructure.Data;
 using Users.Infrastructure.Data.Repositories;
 using Users.Infrastructure.Identity;
 using Users.Infrastructure.Messaging;
+using Users.Infrastructure.Models;
 using Users.Infrastructure.Services;
 
 namespace Microsoft.Extensions.DependencyInjection;
@@ -18,15 +19,25 @@ public static class DependencyInjection
 {
     public static void AddInfrastructureServices(this IHostApplicationBuilder builder)
     {
+        
         builder.Services.AddSingleton<IPasswordHasher, BCryptPasswordHasher>();
         builder.Services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
 
         builder.Services.AddDbContext<UserContext>((sp, options) =>
         {
-            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                throw new InvalidOperationException("Database connection string is not configured.");
+            }
+            options.UseSqlServer(connectionString);
         });
+
         builder.Services.AddScoped<IUserRepository, UserRepository>();
         builder.Services.AddScoped<IEmailService, EmailService>();
         builder.Services.AddSingleton<IMessageBus, RabbitMQService>();
+
+        builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SmtpSettings"));
+        builder.Services.Configure<ApplicationSettings>(builder.Configuration.GetSection("ApplicationSettings"));
     }
 }

@@ -30,10 +30,13 @@ public class AuthController : ControllerBase
         return Ok(result);
     }
 
-    [HttpPost("confirm-email")]
-    public async Task<IActionResult> ConfirmEmail([FromBody] ConfirmEmailCommand command)
+    [HttpGet("confirm-email")]
+    public async Task<IActionResult> ConfirmEmail([FromQuery] string token, [FromQuery] string email)
     {
+        var command = new ConfirmEmailCommand(email, token);
+
         var success = await _mediator.Send(command);
+
         return success
             ? Ok(new { message = "Email successfully confirmed" })
             : BadRequest(new { message = "Invalid or expired token" });
