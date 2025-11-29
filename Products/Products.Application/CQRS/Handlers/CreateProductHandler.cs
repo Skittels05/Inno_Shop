@@ -2,12 +2,11 @@
 using MediatR;
 using Products.Application.CQRS.Commands;
 using Products.Application.DTOs;
+using Products.Application.Exceptions;
 using Products.Domain.Entities;
 using Products.Domain.Interfaces.Repositories;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Products.Application.CQRS.Handlers

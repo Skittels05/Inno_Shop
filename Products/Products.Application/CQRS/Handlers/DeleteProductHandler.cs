@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Products.Application.CQRS.Commands;
+using Products.Application.Exceptions;
 using Products.Domain.Interfaces.Repositories;
 using System;
 using System.Threading;
@@ -18,11 +19,13 @@ namespace Products.Application.CQRS.Handlers
 
         public async Task<Unit> Handle(DeleteProductCommand request, CancellationToken cancellationToken)
         {
-
             var product = await _repository.GetByIdAsync(request.ProductId, request.UserId);
 
             if (product == null)
-                throw new Exception("Product not found or you don't have access.");
+                throw new NotFoundException("Product", request.ProductId);
+
+            if (product.IsDeleted)
+                throw new BadRequestException("Product is already deleted.");
 
             product.IsDeleted = true;
             product.DeletedAt = DateTime.UtcNow;

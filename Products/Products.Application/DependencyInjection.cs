@@ -2,6 +2,7 @@
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.Hosting;
+using Products.Application.Behaviors;
 using System.Reflection;
 
 namespace Microsoft.Extensions.DependencyInjection;
@@ -17,7 +18,9 @@ public static class DependencyInjection
         {
             cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
         });
-        //builder.Services.AddSingleton<IRabbitMQService, RabbitMQService>();
-        //builder.Services.AddHostedService<UserEventsBackgroundService>();
+        builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+        builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+
+
     }
 }

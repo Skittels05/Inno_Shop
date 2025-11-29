@@ -2,6 +2,7 @@
 using MediatR;
 using Products.Application.CQRS.Queries;
 using Products.Application.DTOs;
+using Products.Application.Exceptions;
 using Products.Domain.Interfaces.Repositories;
 using System.Linq;
 using System.Threading;
@@ -27,7 +28,7 @@ namespace Products.Application.CQRS.Handlers
                     .FirstOrDefault(), cancellationToken);
 
             if (product == null)
-                return null;
+                throw new NotFoundException("Product", request.ProductId);
 
             return _mapper.Map<ProductDto>(product);
         }

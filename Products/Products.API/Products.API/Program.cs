@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Products.Application;
 using Products.Infrastructure;
+using Products.Api.Middleware;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -36,7 +37,6 @@ builder.Services.AddAuthentication(options =>
     {
         OnMessageReceived = context =>
         {
-
             if (context.Request.Headers.ContainsKey("Authorization"))
             {
                 var authHeader = context.Request.Headers["Authorization"].ToString();
@@ -90,7 +90,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+
 app.Run();
