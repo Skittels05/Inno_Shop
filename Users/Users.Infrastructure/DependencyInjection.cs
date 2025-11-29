@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -12,6 +13,7 @@ using Users.Infrastructure.Identity;
 using Users.Infrastructure.Messaging;
 using Users.Infrastructure.Models;
 using Users.Infrastructure.Services;
+using Users.Infrastructure.Validators;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -39,5 +41,8 @@ public static class DependencyInjection
 
         builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SmtpSettings"));
         builder.Services.Configure<ApplicationSettings>(builder.Configuration.GetSection("ApplicationSettings"));
+
+        builder.Services.AddScoped<IValidator<SmtpSettings>, SmtpSettingsValidator>();
+        builder.Services.AddScoped<IValidator<ApplicationSettings>, ApplicationSettingsValidator>();
     }
 }

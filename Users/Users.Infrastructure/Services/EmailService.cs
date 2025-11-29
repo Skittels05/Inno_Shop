@@ -1,9 +1,12 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using FluentValidation;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Net;
 using System.Net.Mail;
 using Users.Application.Interfaces.Services;
+using Users.Infrastructure.Exceptions;
 using Users.Infrastructure.Models;
+using Users.Infrastructure.Validators;
 
 namespace Users.Infrastructure.Services
 {
@@ -12,33 +15,72 @@ namespace Users.Infrastructure.Services
         private readonly SmtpSettings _smtpSettings;
         private readonly ApplicationSettings _appSettings;
         private readonly ILogger<EmailService> _logger;
+        private readonly IValidator<SmtpSettings> _smtpValidator;
+        private readonly IValidator<ApplicationSettings> _appSettingsValidator;
 
         public EmailService(
             IOptions<SmtpSettings> smtpSettings,
             IOptions<ApplicationSettings> appSettings,
-            ILogger<EmailService> logger)
+            ILogger<EmailService> logger,
+            IValidator<SmtpSettings> smtpValidator = null,
+            IValidator<ApplicationSettings> appSettingsValidator = null)
         {
             _smtpSettings = smtpSettings.Value;
             _appSettings = appSettings.Value;
             _logger = logger;
+            _smtpValidator = smtpValidator;
+            _appSettingsValidator = appSettingsValidator;
 
-            ValidateSmtpSettings();
+            ValidateConfiguration();
         }
 
-        private void ValidateSmtpSettings()
+        private void ValidateConfiguration()
         {
-            if (string.IsNullOrEmpty(_smtpSettings.Server))
-                throw new ArgumentException("SMTP server is not configured");
+            try
+            {
+                // Валидация SMTP настроек
+                if (_smtpValidator != null)
+                {
+                    var smtpValidationResult = _smtpValidator.Validate(_smtpSettings);
+                    if (!smtpValidationResult.IsValid)
+                    {
+                        var errors = string.Join(", ", smtpValidationResult.Errors.Select(e => e.ErrorMessage));
+                        throw new EmailConfigurationException($"Invalid SMTP configuration: {errors}");
+                    }
+                }
 
-            if (string.IsNullOrEmpty(_smtpSettings.Username))
-                throw new ArgumentException("SMTP username is not configured");
+                // Валидация настроек приложения
+                if (_appSettingsValidator != null)
+                {
+                    var appSettingsValidationResult = _appSettingsValidator.Validate(_appSettings);
+                    if (!appSettingsValidationResult.IsValid)
+                    {
+                        var errors = string.Join(", ", appSettingsValidationResult.Errors.Select(e => e.ErrorMessage));
+                        throw new EmailConfigurationException($"Invalid application configuration: {errors}");
+                    }
+                }
 
-            if (string.IsNullOrEmpty(_smtpSettings.Password))
-                throw new ArgumentException("SMTP password is not configured");
+                if (!IsValidEmail(_smtpSettings.SenderEmail))
+                {
+                    throw new EmailConfigurationException("Invalid sender email format");
+                }
+
+                _logger.LogInformation("Email service configuration validated successfully");
+            }
+            catch (EmailConfigurationException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new EmailConfigurationException("Failed to validate email configuration", ex);
+            }
         }
 
         public async Task SendPasswordRecoveryEmail(string email, string token)
         {
+            ValidateEmail(email);
+
             var resetLink = $"{_appSettings.BaseUrl}/{_appSettings.ResetPasswordPath}?token={WebUtility.UrlEncode(token)}&email={WebUtility.UrlEncode(email)}";
 
             var tokenLifetimeHours = 1;
@@ -52,6 +94,8 @@ namespace Users.Infrastructure.Services
 
         public async Task SendEmailConfirmationEmail(string email, string token)
         {
+            ValidateEmail(email);
+
             var confirmationLink = $"{_appSettings.BaseUrl}/{_appSettings.ConfirmEmailPath}?token={WebUtility.UrlEncode(token)}&email={WebUtility.UrlEncode(email)}";
 
             var tokenLifetimeHours = 24;
@@ -61,6 +105,32 @@ namespace Users.Infrastructure.Services
             var body = CreateEmailConfirmationBody(confirmationLink, expiryTime);
 
             await SendEmailAsync(email, subject, body);
+        }
+
+        private void ValidateEmail(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                throw new ArgumentException("Email cannot be null or empty", nameof(email));
+            }
+
+            if (!IsValidEmail(email))
+            {
+                throw new ArgumentException("Invalid email format", nameof(email));
+            }
+        }
+
+        private bool IsValidEmail(string email)
+        {
+            try
+            {
+                var addr = new System.Net.Mail.MailAddress(email);
+                return addr.Address == email;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         private string CreatePasswordRecoveryEmailBody(string resetLink, DateTime expiryTime)
@@ -101,7 +171,7 @@ Support Team";
         {
             try
             {
-                _logger.LogInformation("Attempting to send email to {Email}", toEmail);
+                _logger.LogInformation("Attempting to send email to {Email} with subject {Subject}", toEmail, subject);
 
                 using var client = CreateSmtpClient();
                 using var message = CreateMailMessage(toEmail, subject, body);
@@ -110,37 +180,58 @@ Support Team";
 
                 _logger.LogInformation("Email sent successfully to {Email}", toEmail);
             }
+            catch (SmtpException ex)
+            {
+                var errorMessage = $"SMTP error while sending email to {toEmail}: {ex.Message}";
+                _logger.LogError(ex, errorMessage);
+                throw new EmailSendingException(toEmail, subject, errorMessage, ex);
+            }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to send email to {Email}", toEmail);
-                throw new InvalidOperationException($"Failed to send email: {ex.Message}", ex);
+                var errorMessage = $"Unexpected error while sending email to {toEmail}: {ex.Message}";
+                _logger.LogError(ex, errorMessage);
+                throw new EmailSendingException(toEmail, subject, errorMessage, ex);
             }
         }
 
         private SmtpClient CreateSmtpClient()
         {
-            return new SmtpClient(_smtpSettings.Server, _smtpSettings.Port)
+            try
             {
-                EnableSsl = _smtpSettings.EnableSsl,
-                UseDefaultCredentials = false,
-                Credentials = new NetworkCredential(_smtpSettings.Username, _smtpSettings.Password),
-                DeliveryMethod = SmtpDeliveryMethod.Network,
-                Timeout = 30000
-            };
+                return new SmtpClient(_smtpSettings.Server, _smtpSettings.Port)
+                {
+                    EnableSsl = _smtpSettings.EnableSsl,
+                    UseDefaultCredentials = false,
+                    Credentials = new NetworkCredential(_smtpSettings.Username, _smtpSettings.Password),
+                    DeliveryMethod = SmtpDeliveryMethod.Network,
+                    Timeout = 30000
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new EmailConfigurationException("Failed to create SMTP client", ex);
+            }
         }
 
         private MailMessage CreateMailMessage(string toEmail, string subject, string body)
         {
-            return new MailMessage
+            try
             {
-                From = new MailAddress(_smtpSettings.SenderEmail, _smtpSettings.SenderName),
-                To = { toEmail },
-                Subject = subject,
-                Body = body,
-                IsBodyHtml = false,
-                BodyEncoding = System.Text.Encoding.UTF8,
-                SubjectEncoding = System.Text.Encoding.UTF8
-            };
+                return new MailMessage
+                {
+                    From = new MailAddress(_smtpSettings.SenderEmail, _smtpSettings.SenderName),
+                    To = { toEmail },
+                    Subject = subject,
+                    Body = body,
+                    IsBodyHtml = false,
+                    BodyEncoding = System.Text.Encoding.UTF8,
+                    SubjectEncoding = System.Text.Encoding.UTF8
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new EmailSendingException(toEmail, subject, "Failed to create email message", ex);
+            }
         }
     }
 }

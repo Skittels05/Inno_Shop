@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using Users.Application.Exceptions;
 using Users.Api.Models;
+using Users.Infrastructure.Exceptions;
 
 namespace Users.Api.Middleware;
 
@@ -50,6 +51,18 @@ public class ExceptionMiddleware
             UnauthorizedAccessException => (
                 StatusCodes.Status401Unauthorized,
                 new ErrorResponse(true, "Unauthorized", null, traceId)
+            ),
+            EmailConfigurationException emailConfigEx => (
+                StatusCodes.Status500InternalServerError,
+                new ErrorResponse(true, "Email service configuration error", null, traceId)
+            ),
+            EmailSendingException emailSendEx => (
+                StatusCodes.Status500InternalServerError,
+                new ErrorResponse(true, "Failed to send email", null, traceId)
+            ),
+            EmailException emailEx => (
+                StatusCodes.Status500InternalServerError,
+                new ErrorResponse(true, "Email service error", null, traceId)
             ),
             _ => (
                 StatusCodes.Status500InternalServerError,
