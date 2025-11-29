@@ -22,10 +22,17 @@ public class AuthController : ControllerBase
         return CreatedAtAction(nameof(Register), new { id = userId }, userId);
     }
 
-
-    [HttpPost("login")]
-    public async Task<ActionResult<AuthResultDto>> Login([FromBody] UserLoginDto dto)
+    [HttpPost("reset-password")]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto dto)
     {
+        await _mediator.Send(new ResetPasswordCommand(dto));
+        return Ok(new { message = "Password successfully reset" });
+    }
+
+    [HttpGet("login")]
+    public async Task<ActionResult<AuthResultDto>> Login([FromQuery] string email, [FromQuery] string password)
+    {
+        var dto = new UserLoginDto(email, password);
         var result = await _mediator.Send(new LoginUserCommand(dto));
         return Ok(result);
     }
@@ -34,7 +41,6 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> ConfirmEmail([FromQuery] string token, [FromQuery] string email)
     {
         var command = new ConfirmEmailCommand(email, token);
-
         var success = await _mediator.Send(command);
 
         return success
@@ -42,22 +48,18 @@ public class AuthController : ControllerBase
             : BadRequest(new { message = "Invalid or expired token" });
     }
 
-    [HttpPost("forgot-password")]
-    public async Task<IActionResult> ForgotPassword([FromBody] PasswordRecoveryDto dto)
+    [HttpGet("forgot-password")]
+    public async Task<IActionResult> ForgotPassword([FromQuery] string email)
     {
+        var dto = new PasswordRecoveryDto(email);
         await _mediator.Send(new PasswordRecoveryCommand(dto));
         return Ok(new { message = "If email exists, recovery link has been sent" });
     }
 
-    [HttpPost("reset-password")]
-    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto dto)
+    [HttpGet("send-confirmation")]
+    public async Task<IActionResult> SendConfirmation([FromQuery] string email)
     {
-        await _mediator.Send(new ResetPasswordCommand(dto));
-        return Ok(new { message = "Password successfully reset" });
-    }
-    [HttpPost("send-confirmation")]
-    public async Task<IActionResult> SendConfirmation([FromBody] SendEmailConfirmationCommand command)
-    {
+        var command = new SendEmailConfirmationCommand(email);
         await _mediator.Send(command);
         return Ok(new { message = "Confirmation email sent" });
     }
