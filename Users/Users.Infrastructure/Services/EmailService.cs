@@ -38,7 +38,6 @@ namespace Users.Infrastructure.Services
         {
             try
             {
-                // Валидация SMTP настроек
                 if (_smtpValidator != null)
                 {
                     var smtpValidationResult = _smtpValidator.Validate(_smtpSettings);
@@ -49,7 +48,6 @@ namespace Users.Infrastructure.Services
                     }
                 }
 
-                // Валидация настроек приложения
                 if (_appSettingsValidator != null)
                 {
                     var appSettingsValidationResult = _appSettingsValidator.Validate(_appSettings);

@@ -4,11 +4,15 @@
     <Project Path="Products/Products.Application/Products.Application.csproj" />
     <Project Path="Products/Products.Domain/Products.Domain.csproj" />
     <Project Path="Products/Products.Infrastructure/Products.Infrastructure/Products.Infrastructure.csproj" Id="8c18bbab-44d8-4d6d-86a7-faf23d3c3a9e" />
+    <Project Path="Products/Products.UnitTests/Products.UnitTests.csproj" />
+    <Project Path="Products/Products.IntegrationTests/Products.IntegrationTests.csproj" />
   </Folder>
   <Folder Name="/Users/">
     <Project Path="Users/Users.API/Users.API.csproj" Id="514580fe-be5b-4d87-8c5e-d3ab82172378" />
     <Project Path="Users/Users.Application/Users.Application.csproj" />
     <Project Path="Users/Users.Domain/Users.Domain.csproj" />
     <Project Path="Users/Users.Infrastructure/Users.Infrastructure.csproj" />
+    <Project Path="Users/Users.UnitTests/Users.UnitTests.csproj" />
+    <Project Path="Users/Users.IntegrationTests/Users.IntegrationTests.csproj" />
   </Folder>
 </Solution>
